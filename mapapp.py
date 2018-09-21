@@ -4,12 +4,11 @@ from bokeh.models import ColumnDataSource, GMapOptions, TextInput, Button
 from bokeh.layouts import row, column
 from bokeh.plotting import gmap
 from bokeh.layouts import widgetbox
-from boto.s3.connection import S3Connection
 
 #Options
 mapnum = 0
 map_options = GMapOptions(lat=40.7128, lng=-74.0060, map_type="roadmap", zoom=11)
-GoogleAPIKey = S3Connection(os.environ['GoogleAPIKey'])
+GoogleAPIKey = os.environ['GoogleAPIKey']
 
 #Functions
 
