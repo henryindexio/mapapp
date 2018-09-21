@@ -1,1 +1,1 @@
-web: bokeh serve --port=$PORT --num-procs=0 --address=0.0.0.0 --use-xheaders mapapp.py
+web: bokeh serve --port=$PORT --num-procs=0 --allow-websocket-origin=yoga-mapapp.herokuapp.com --address=0.0.0.0 --use-xheaders mapapp.py
