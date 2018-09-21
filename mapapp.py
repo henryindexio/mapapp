@@ -1,4 +1,3 @@
-import pickle
 from bokeh.io import output_file, show, curdoc
 from bokeh.models import ColumnDataSource, GMapOptions, TextInput, Button
 from bokeh.layouts import row, column
@@ -8,15 +7,12 @@ from bokeh.layouts import widgetbox
 
 #Options
 mapnum = 0
-output_file("gmap.html")
 map_options = GMapOptions(lat=40.7128, lng=-74.0060, map_type="roadmap", zoom=11)
 
 #Functions
 
 def my_button_handler():
     curdoc().add_root(column2)
-
-
 
 #Text Input
 text_input = TextInput(value="10001", title="Zipcode:")
@@ -27,9 +23,6 @@ button.on_click(my_button_handler)
 
 #column 1
 column1 = column([text_input] + [button])
-
-
-
 
 # For GMaps to function, Google requires you obtain and enable an API key:
 #
