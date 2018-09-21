@@ -10,10 +10,6 @@ from bokeh.layouts import widgetbox
 mapnum = 0
 output_file("gmap.html")
 map_options = GMapOptions(lat=40.7128, lng=-74.0060, map_type="roadmap", zoom=11)
-#Load Google API key and connect to API
-f = open('/home/henry/Insight/APIKey/GooglePlacesAPIKey.pckl', 'rb')
-GoogleAPIKey = pickle.load(f)
-f.close()
 
 #Functions
 
