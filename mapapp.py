@@ -1,3 +1,4 @@
+import pickle
 import os
 from bokeh.io import output_file, show, curdoc
 from bokeh.models import ColumnDataSource, GMapOptions, TextInput, Button
@@ -9,6 +10,12 @@ from bokeh.layouts import widgetbox
 mapnum = 0
 map_options = GMapOptions(lat=40.7128, lng=-74.0060, map_type="roadmap", zoom=11)
 GoogleAPIKey = os.environ['GoogleAPIKey']
+
+#Load zip code data frame data
+
+f = open('ZipcodeDistanceDf.pckl', 'rb')
+ModelDf = pickle.load(f)
+f.close()
 
 #Functions
 
