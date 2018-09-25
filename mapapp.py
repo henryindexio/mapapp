@@ -15,13 +15,13 @@ GoogleAPIKey = os.environ['GoogleAPIKey']
 #Load zip code data frame data
 
 f = open('ZipcodeDistanceDf.pckl', 'rb')
-ModelDf = pickle.load(f)
+ZipcodeDistanceDf = pickle.load(f)
 f.close()
 
 #Functions
 
 def my_button_handler():
-    text_input.value = "22222"
+    text_input.value = str(ZipcodeDistanceDf.iloc[8,0])
     #curdoc().add_root(column2)
 
 #Text Input
