@@ -21,7 +21,8 @@ f.close()
 #Functions
 
 def my_button_handler():
-    curdoc().add_root(column2)
+    text_input.value = "22222"
+    #curdoc().add_root(column2)
 
 #Text Input
 text_input = TextInput(value="10001", title="Zipcode:")
