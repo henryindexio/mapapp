@@ -26,7 +26,7 @@ ModelDf = pickle.load(f)
 f.close()
 
 #Load Yoga Score prediction
-f = open('PredictDF.pckl', 'rb')
+f = open('PredictDf.pckl', 'rb')
 PredictDf = pickle.load(f)
 f.close()
 
