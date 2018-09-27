@@ -109,7 +109,7 @@ def update():
     #Create hovertool
     my_hover = HoverTool()
     my_hover.tooltips = [            
-                ("Score", "@ScoreRecommend"),  
+                ("Yogee Location Score", "@ScoreRecommend"),  
                 ("Zip code", "@ZipRecommend"),                
                 ("Population", "@PopulationRecommend"),
                 ("Females per 100 males", "@FemaleRatioRecommend"),
