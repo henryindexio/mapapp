@@ -88,7 +88,7 @@ def update():
             FemaleRatio = ModelRow['FemaleRatio'].iloc[0]
             Income = ModelRow['Income'].iloc[0]
             PopDensity = np.round(ModelRow['PopDensity'].iloc[0]/.0000003880) 
-            if Score > 5:
+            if Score > 50:
                 ZipRecommend.append(ZipRow)
                 ScoreRecommend.append(Score)
                 LatRecommend.append(LatRow)
