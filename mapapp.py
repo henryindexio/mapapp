@@ -83,7 +83,7 @@ def update():
         PredictRow = PredictDf[PredictDf['zip']==ZipRow]
         ModelRow = ModelDf[(ModelDf['zip']==ZipRow) & (ModelDf['year']==2016)]
         if not PredictRow.empty:
-            Score = np.round(PredictRow['Score'].iloc[0]*100)/100
+            Score = (np.round(PredictRow['Score'].iloc[0]*100)/100)*10
             Population = ModelRow['population'].iloc[0]
             FemaleRatio = ModelRow['FemaleRatio'].iloc[0]
             Income = ModelRow['Income'].iloc[0]
