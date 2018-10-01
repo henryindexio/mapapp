@@ -165,10 +165,10 @@ def update():
         listOfSubLayouts.append(plotToAdd)
 
 #Text Input
-text_input = TextInput(value="13901", title="Zipcode:")
+text_input = TextInput(placeholder="Type in Zipcode", title="Zipcode:")
 
 #Search button
-button = Button(label="Find Yoga Studio Location", button_type="success")
+button = Button(label="Find Locations to Open a New Yoga Studio", button_type="success")
 button.on_click(update)
 
 #column 1
