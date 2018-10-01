@@ -134,7 +134,7 @@ def update():
               
 
         #Make map with recommended zipcodes
-        map_options = GMapOptions(lat=np.mean(LatRecommend), lng=np.mean(LonRecommend), map_type="roadmap", zoom=13)
+        map_options = GMapOptions(lat=np.mean(LatRecommend), lng=np.mean(LonRecommend), map_type="roadmap", zoom=12)
         p = gmap(GoogleAPIKey, map_options, title="Yogee", name='plot2')
         source = ColumnDataSource(
             data=dict(
