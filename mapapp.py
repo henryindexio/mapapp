@@ -4,20 +4,28 @@ import pandas as pd
 import numpy as np
 from math import radians, cos, sin, asin, sqrt
 from bokeh.io import output_file, show, curdoc
-from bokeh.models import ColumnDataSource, GMapOptions, TextInput, Button, HoverTool
+from bokeh.models import ColumnDataSource, GMapOptions, TextInput, Button, HoverTool, glyphs
 from bokeh.layouts import row, column, widgetbox
 from bokeh.plotting import gmap
 
 #Options
  
-
 #Load google api key
 GoogleAPIKey = os.environ['GoogleAPIKey']
 
+#Load google api key
+f = open('/home/henry/Insight/APIKey/GooglePlacesAPIKey.pckl', 'rb')
+GoogleAPIKey = pickle.load(f)
+f.close()
 
-#Load zip code data frame data
+#Load zip code distance data frame data
 f = open('ZipcodeDistanceDf.pckl', 'rb')
 NYZipcodeDistanceDf = pickle.load(f)
+f.close()
+
+#Load zip code boundary data frame data
+f = open('ZipcodeBoundaryDf.pckl', 'rb')
+ZipcodeBoundaryDf = pickle.load(f)
 f.close()
 
 #Load Yoga model dataset
@@ -62,8 +70,8 @@ def update():
     InputLon = InputZipRow['Longitude'].iloc[0]
     InputLat = InputZipRow['Latitude'].iloc[0]
     CloseZipcodeDf = closestzipcode(InputLon,InputLat,NYZipcodeDistanceDf)
-    CloseZipcodeDf = CloseZipcodeDf[CloseZipcodeDf['Distance']<5]
-    
+    CloseZipcodeDf = CloseZipcodeDf[CloseZipcodeDf['Distance']<10]
+
     #Recommend 5 zipcodes near search
     NumZipRecommend = 0
     i = 0
@@ -71,79 +79,101 @@ def update():
     ScoreRecommend = []
     LonRecommend = []
     LatRecommend = []
+    LonBoundaryRecommend = []
+    LatBoundaryRecommend = []
     PopulationRecommend = []
     FemaleRatioRecommend = []
     IncomeRecommend = []
-    PopDensityRecommend = []    
+    PopDensityRecommend = []
+    FillColor = []    
+    Alpha = []
 
     while (NumZipRecommend < 5) and (i < CloseZipcodeDf.shape[0]): 
         ZipRow = CloseZipcodeDf.iloc[i,0]
         LonRow = CloseZipcodeDf.iloc[i,2]
         LatRow = CloseZipcodeDf.iloc[i,1]
+        BoundaryRow = ZipcodeBoundaryDf[ZipcodeBoundaryDf['zip']==ZipRow]
+        LonBoundary = BoundaryRow['LongitudeBoundary'].iloc[0]
+        LatBoundary = BoundaryRow['LatitudeBoundary'].iloc[0]
         PredictRow = PredictDf[PredictDf['zip']==ZipRow]
         ModelRow = ModelDf[(ModelDf['zip']==ZipRow) & (ModelDf['year']==2016)]
+        
         if not PredictRow.empty:
-            Score = (np.round(PredictRow['Score'].iloc[0]*100)/100)*10
+            Score = np.int(np.round(PredictRow['Score'].iloc[0]*10))
             Population = ModelRow['population'].iloc[0]
             FemaleRatio = ModelRow['FemaleRatio'].iloc[0]
             Income = ModelRow['Income'].iloc[0]
             PopDensity = np.round(ModelRow['PopDensity'].iloc[0]/.0000003880) 
+            AlphaValue = ((Score-50)/62.5)+.1
             if Score > 50:
                 ZipRecommend.append(ZipRow)
                 ScoreRecommend.append(Score)
                 LatRecommend.append(LatRow)
                 LonRecommend.append(LonRow)
+                LatBoundaryRecommend.append(LatBoundary)
+                LonBoundaryRecommend.append(LonBoundary)
                 PopulationRecommend.append(Population)
                 FemaleRatioRecommend.append(FemaleRatio)
                 IncomeRecommend.append(Income)
                 PopDensityRecommend.append(PopDensity)
+                FillColor.append('Purple')
+                Alpha.append(AlphaValue)
                 NumZipRecommend = NumZipRecommend + 1            
-        i = i + 1
-   
+        i = i + 1      
+
     #Remove old map
     rootLayout = curdoc().get_model_by_name('column2')
     listOfSubLayouts = rootLayout.children
     plotToRemove = curdoc().get_model_by_name('plot2')
     listOfSubLayouts.remove(plotToRemove)
-   
-    #Create hovertool
-    my_hover = HoverTool()
-    my_hover.tooltips = [            
-                ("Yogee Location Score", "@ScoreRecommend"),  
-                ("Zip code", "@ZipRecommend"),                
-                ("Population", "@PopulationRecommend"),
-                ("Females per 100 males", "@FemaleRatioRecommend"),
-                ("Median Income", "@IncomeRecommend"),
-                ("Population Density", "@PopDensityRecommend")
-    ]
-          
+    if NumZipRecommend > 0:
+        #Create hovertool
+        my_hover = HoverTool()
+        my_hover.tooltips = [            
+                    ("Score", "@ScoreRecommend"),
+                    ("Zip code", "@ZipRecommend"),                
+                    ("Population", "@PopulationRecommend"),
+                    ("Median Income", "@IncomeRecommend"),
+                    ("Population Density", "@PopDensityRecommend")
+        ]
+              
 
-    #Make map with recommended zipcodes
-    map_options = GMapOptions(lat=np.mean(LatRecommend), lng=np.mean(LonRecommend), map_type="roadmap", zoom=13)
-    p = gmap(GoogleAPIKey, map_options, title="Yogee", name='plot2')
-    source = ColumnDataSource(
-        data=dict(
-                ZipRecommend=ZipRecommend,
-                ScoreRecommend=ScoreRecommend,
-                LatRecommend=LatRecommend,
-                LonRecommend=LonRecommend,
-                PopulationRecommend=PopulationRecommend,
-                FemaleRatioRecommend=FemaleRatioRecommend,
-                IncomeRecommend=IncomeRecommend,
-                PopDensityRecommend=PopDensityRecommend
-                
+        #Make map with recommended zipcodes
+        map_options = GMapOptions(lat=np.mean(LatRecommend), lng=np.mean(LonRecommend), map_type="roadmap", zoom=12)
+        p = gmap(GoogleAPIKey, map_options, title="Yogee", name='plot2')
+        source = ColumnDataSource(
+            data=dict(
+                    ZipRecommend=ZipRecommend,
+                    ScoreRecommend=ScoreRecommend,
+                    LatRecommend=LatRecommend,
+                    LonRecommend=LonRecommend,
+                    LatBoundaryRecommend=LatBoundaryRecommend,
+                    LonBoundaryRecommend=LonBoundaryRecommend,
+                    PopulationRecommend=PopulationRecommend,
+                    IncomeRecommend=IncomeRecommend,
+                    PopDensityRecommend=PopDensityRecommend,
+                    FillColor=FillColor,
+                    Alpha=Alpha
+                    
+            )
         )
-    )
-    p.circle(x="LonRecommend", y="LatRecommend", size=15, fill_color="purple", fill_alpha=0.8, source=source)
-    p.add_tools(my_hover)
-    plotToAdd = p
-    listOfSubLayouts.append(plotToAdd)
+
+        #p.circle(x="LonRecommend", y="LatRecommend", size=15, fill_color="purple", fill_alpha=0.8, source=source)
+        p.patches(xs="LonBoundaryRecommend", ys="LatBoundaryRecommend", fill_color="FillColor", alpha="Alpha", source=source)
+        p.add_tools(my_hover)
+        plotToAdd = p
+        listOfSubLayouts.append(plotToAdd)
+    else:
+        map_options = GMapOptions(lat=InputLat, lng=InputLon, map_type="roadmap", zoom=12)
+        p = gmap(GoogleAPIKey, map_options, title="Yogee", name='plot2')
+        plotToAdd = p
+        listOfSubLayouts.append(plotToAdd)
 
 #Text Input
-text_input = TextInput(value="00000", title="Zipcode:")
+text_input = TextInput(value="13901", title="Zipcode:")
 
 #Search button
-button = Button(label="Find Neigborhoods to Open a New Yoga Studio ", button_type="success")
+button = Button(label="Find Yoga Studio Location", button_type="success")
 button.on_click(update)
 
 #column 1
@@ -151,13 +181,15 @@ column1 = column([text_input] + [button])
 
 #column 2
 #add column 2
-map_options = GMapOptions(lat=40.750672, lng=-73.9972808, map_type="roadmap", zoom=11)
+map_options = GMapOptions(lat=40.750672, lng=-73.9972808, map_type="roadmap", zoom=12)
 p = gmap(GoogleAPIKey, map_options, title="Yogee", name='plot2')
-source = ColumnDataSource(
-    data=dict(lat=[],
-              lon=[])
-)
-p.circle(x="lon", y="lat", size=15, fill_color="purple", fill_alpha=0.8, source=source)
+#source = ColumnDataSource(
+#    data=dict(lat=ZipcodeBoundaryDf.loc[1,'LatitudeBoundary'],
+#              lon=ZipcodeBoundaryDf.loc[1,'LongitudeBoundary'])
+#)
+#p.circle(x="lon", y="lat", size=15, fill_color="purple", fill_alpha=0.8, source=source)
+#p.patch(x="lon", y="lat", fill_color="purple", alpha=0.3, line_width=1, source=source)
+
 column2 = column([p], name='column2')
 
 #add columns to curdoc
