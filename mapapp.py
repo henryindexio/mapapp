@@ -13,11 +13,6 @@ from bokeh.plotting import gmap
 #Load google api key
 GoogleAPIKey = os.environ['GoogleAPIKey']
 
-#Load google api key
-f = open('/home/henry/Insight/APIKey/GooglePlacesAPIKey.pckl', 'rb')
-GoogleAPIKey = pickle.load(f)
-f.close()
-
 #Load zip code distance data frame data
 f = open('ZipcodeDistanceDf.pckl', 'rb')
 NYZipcodeDistanceDf = pickle.load(f)
