@@ -1,3 +1,7 @@
+
+#Load google api key
+GoogleAPIKey = os.environ['GoogleAPIKey']
+
 import pickle
 import os
 import pandas as pd
@@ -5,13 +9,15 @@ import numpy as np
 from math import radians, cos, sin, asin, sqrt
 from bokeh.io import output_file, show, curdoc
 from bokeh.models import ColumnDataSource, GMapOptions, TextInput, Button, HoverTool, glyphs
-from bokeh.layouts import row, column, widgetbox
+from bokeh.layouts import row, column, widgetbox, layout
 from bokeh.plotting import gmap
 
 #Options
  
 #Load google api key
-GoogleAPIKey = os.environ['GoogleAPIKey']
+f = open('/home/henry/Insight/APIKey/GooglePlacesAPIKey.pckl', 'rb')
+GoogleAPIKey = pickle.load(f)
+f.close()
 
 #Load zip code distance data frame data
 f = open('ZipcodeDistanceDf.pckl', 'rb')
@@ -117,9 +123,9 @@ def update():
         i = i + 1      
 
     #Remove old map
-    rootLayout = curdoc().get_model_by_name('column2')
+    rootLayout = curdoc().get_model_by_name('column1')
     listOfSubLayouts = rootLayout.children
-    plotToRemove = curdoc().get_model_by_name('plot2')
+    plotToRemove = curdoc().get_model_by_name('plot1')
     listOfSubLayouts.remove(plotToRemove)
     if NumZipRecommend > 0:
         #Create hovertool
@@ -135,7 +141,7 @@ def update():
 
         #Make map with recommended zipcodes
         map_options = GMapOptions(lat=np.mean(LatRecommend), lng=np.mean(LonRecommend), map_type="roadmap", zoom=12)
-        p = gmap(GoogleAPIKey, map_options, title="Yogee", name='plot2')
+        p = gmap(GoogleAPIKey, map_options, title="Yogee", name='plot1')
         source = ColumnDataSource(
             data=dict(
                     ZipRecommend=ZipRecommend,
@@ -160,34 +166,24 @@ def update():
         listOfSubLayouts.append(plotToAdd)
     else:
         map_options = GMapOptions(lat=InputLat, lng=InputLon, map_type="roadmap", zoom=12)
-        p = gmap(GoogleAPIKey, map_options, title="Yogee", name='plot2')
+        p = gmap(GoogleAPIKey, map_options, title="Yogee", name='plot1')
         plotToAdd = p
         listOfSubLayouts.append(plotToAdd)
 
 #Text Input
-text_input = TextInput(placeholder="Type in Zipcode", title="Zipcode:")
+text_input = TextInput(placeholder="Type in Zipcode")
 
 #Search button
-button = Button(label="Find Locations to Open a New Yoga Studio", button_type="success")
+button = Button(label="Find Locations", button_type="success")
 button.on_click(update)
 
-#column 1
-column1 = column([text_input] + [button])
-
-#column 2
-#add column 2
+#Map
 map_options = GMapOptions(lat=40.750672, lng=-73.9972808, map_type="roadmap", zoom=12)
-p = gmap(GoogleAPIKey, map_options, title="Yogee", name='plot2')
-#source = ColumnDataSource(
-#    data=dict(lat=ZipcodeBoundaryDf.loc[1,'LatitudeBoundary'],
-#              lon=ZipcodeBoundaryDf.loc[1,'LongitudeBoundary'])
-#)
-#p.circle(x="lon", y="lat", size=15, fill_color="purple", fill_alpha=0.8, source=source)
-#p.patch(x="lon", y="lat", fill_color="purple", alpha=0.3, line_width=1, source=source)
+p = gmap(GoogleAPIKey, map_options, name='plot1')
 
-column2 = column([p], name='column2')
+#layout 1
+column1 = column([text_input,button,p], name='column1')
 
-#add columns to curdoc
+#add layout to curdoc
 curdoc().add_root(column1)
-curdoc().add_root(column2)
 curdoc().title = "Yogee"
