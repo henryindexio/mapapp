@@ -154,7 +154,8 @@ def update():
         )
 
         #p.circle(x="LonRecommend", y="LatRecommend", size=15, fill_color="purple", fill_alpha=0.8, source=source)
-        p.patches(xs="LonBoundaryRecommend", ys="LatBoundaryRecommend", fill_color="FillColor", alpha="Alpha", line_width = 3, source=source)
+        p.patches(xs="LonBoundaryRecommend", ys="LatBoundaryRecommend", fill_color="FillColor", 
+                  alpha="Alpha", line_color = "black", line_width = 4, line_alpha = 1, source=source)
         p.add_tools(my_hover)
         plotToAdd = p
         listOfSubLayouts.append(plotToAdd)
